@@ -1,2 +1,2 @@
-# marquee-app
-marquee laravel app
+# laravel_start_skeleton
+

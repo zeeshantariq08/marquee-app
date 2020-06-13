@@ -1,0 +1,90 @@
+"A datetime string with format `Y-m-d H:i:s`, e.g. `2018-01-01 13:00:00`."
+scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+
+"A date string with format `Y-m-d`, e.g. `2011-05-23`."
+scalar Date @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Date")
+
+
+# type AuthToken {
+#     token_type: String!
+#     expires_in: Int!
+#     access_token: String!
+#     refresh_token: String!
+# }
+
+type Query @middleware(checks:["auth:api"]){
+    # me: User @middleware(checks:["auth:api"]) @auth
+    usergroups: [UserGroup] @all
+    user: [User] @all
+    marquee: [Marquee] @all
+    service: [Service] @all
+
+}
+
+
+type Mutation {
+    createUserGroup (name: String!, description: String! ): UserGroup! @create
+
+    createUser(
+        name: String!
+        email: String @rules(apply: ["required", "email", "unique:users,email"])
+        password: String  @rules(apply: ["required", "min:8"]) @bcrypt
+        contact: String @rules(apply: ["required"])
+        user_group_id: Int!
+    ): User! @create
+#
+#    updateUser(
+#        id: ID @rules(apply: ["required"])
+#
+#    )
+
+    deleteUser(id: ID!): User @delete
+}
+
+input CreateUserInput{
+    name: String!
+    email: String!
+    password: String!
+    contact: String!
+    usergroup: CreateUserGroupRelation
+}
+
+input CreateUserGroupRelation{
+    connect: ID
+}
+type User {
+    id: ID!
+    name: String!
+    email: String!
+    password: String!
+    userg: UserGroup @belongsTo
+}
+type Marquee {
+    id: ID!
+    slug: String!
+    name: String!
+    phoneno: String!
+    address: String!
+    email: String!
+    description: String!
+    status:Boolean!
+}
+type Service {
+    id: ID!
+    slug: String!
+    name: String!
+    description: String!
+}
+
+type UserGroup {
+    id: ID!
+    name: String!
+    slug: String!
+    description: String!
+    created_at: DateTime!
+    updated_at: DateTime!
+    users: [User] @hasMany
+}
+
+
+
